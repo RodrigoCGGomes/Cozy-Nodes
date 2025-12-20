@@ -15,17 +15,17 @@ namespace ShaderFactory.CozyGraphToolkit.Runtime
         private RuntimeCozyNode node;
 
         // UNITY-SERIALIZABLE TYPE FIELDS  
-        public string StringValue;
-        public float FloatValue;
-        public int IntValue;
-        public bool BoolValue;
-        public RuntimeIPort PortValue;
+        public string stringValue;
+        public float floatValue;
+        public int intValue;
+        public bool boolValue;
+        public CozyRuntimePort connectedPort;
 
         /// <summary> Defines the types of values a port can have. If a node is connect, value type will be port. </summary>
         public enum PortType { String, Float, Int, Bool, Port, SpecialCode}
 
         /// <summary> Stores which value should be used. (What is connected to thi) </summary>
-        public PortType Type;
+        public PortType type;
 
         /// <summary>
         /// 
@@ -35,35 +35,35 @@ namespace ShaderFactory.CozyGraphToolkit.Runtime
         {
             if (_value is float f)
             {
-                Type = PortType.Float;
-                FloatValue = f;
+                type = PortType.Float;
+                floatValue = f;
                 ImportMessage = "Float";
             }
             else if (_value is int i)
             {
-                Type = PortType.Int;
-                IntValue = i;
+                type = PortType.Int;
+                intValue = i;
                 ImportMessage = "Integer";
             }
             else if (_value is bool b)
             {
-                Type = PortType.Bool;
-                BoolValue = b;
+                type = PortType.Bool;
+                boolValue = b;
                 ImportMessage = "Boolean";
             }
             else if (_value is string s)
             {
-                Type = PortType.String;
-                StringValue = s;
+                type = PortType.String;
+                stringValue = s;
                 ImportMessage = "String";
             }
-            else if (_value is RuntimeIPort rip)
+            else if (_value is CozyRuntimePort crp)
             {
-                Type = PortType.Port;
-                PortValue = new RuntimeIPort(rip.nodeID, rip.portName);
+                type = PortType.Port;
+                connectedPort = crp;
                 ImportMessage = "Connected Node";
             }
-            else if (_value is RuntimeIVariable riv)
+            /*else if (_value is RuntimeIVariable riv)
             {
                 Type = PortType.Port;
                 PortValue = new RuntimeIPort(riv.nodeID, riv.variableName);
@@ -74,24 +74,27 @@ namespace ShaderFactory.CozyGraphToolkit.Runtime
                 Type = PortType.Port;
                 PortValue = new RuntimeIPort(ric.nodeID, ric.constantName);
                 ImportMessage = "Constant (Connected Node)";
-            }
+            }*/
             else if (_value is null)
             {
                 ImportMessage = "Import Failed!";
             }
         }
 
-        /// <summary>
-        /// Reads the value if the port is not connected, evaluates the value if so.
-        /// </summary>
+        public void SetSpecialValue(int _code)
+        { 
+            
+        }
+
+        /// <summary> Reads the value if the port is not connected, evaluates the value if so. </summary>
         public object GetValue()
         {
-            return Type switch
+            return type switch
             {
-                PortType.Float => FloatValue,
-                PortType.Int => IntValue,
-                PortType.String => StringValue,
-                PortType.Bool => BoolValue,
+                PortType.Float => floatValue,
+                PortType.Int => intValue,
+                PortType.String => stringValue,
+                PortType.Bool => boolValue,
                 PortType.Port => EvaluateConnectedPort(),
                 _ => null
             };
@@ -99,22 +102,9 @@ namespace ShaderFactory.CozyGraphToolkit.Runtime
 
         private object EvaluateConnectedPort()
         {
-            // var result = PortValue.node
-            return "PORT, CAN'T RETRIEVE VALUE YET";
-        }
-    }
-
-    [Serializable]
-    public class RuntimeIPort
-    {
-        public string nodeID;
-        public string portName;
-        public RuntimeCozyNode node;
-
-        public RuntimeIPort(string _nodeID, string _portName)
-        {
-            nodeID = _nodeID;
-            portName = _portName;
+            // CozyRuntimePort _connectedPort = connectedPort;
+            return connectedPort.GetValue();
+            // return "PORT, CAN'T RETRIEVE VALUE YET";
         }
     }
 

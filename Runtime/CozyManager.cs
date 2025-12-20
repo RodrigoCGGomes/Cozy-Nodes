@@ -42,6 +42,7 @@ namespace ShaderFactory.CozyGraphToolkit.Runtime
             // Debug.LogWarning(current.NodeType);
 
             current.Run();
+            Next();
         }
 
         public void Next()
